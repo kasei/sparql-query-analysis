@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "SPARQLQueryAnalysis",
+    platforms: [.macOS(.v10_15)],
     products: [
         .library(
             name: "SPARQLQueryAnalysis",
@@ -12,14 +13,19 @@ let package = Package(
         ),
     ],
     dependencies: [
-		.package(name: "SPARQLSyntax", url: "https://github.com/kasei/swift-sparql-syntax.git", .upToNextMinor(from: "0.0.82")),
-		.package(name: "Kineo", url: "https://github.com/kasei/kineo.git", .upToNextMinor(from: "0.0.30"))
+		.package(name: "SPARQLSyntax", url: "https://github.com/kasei/swift-sparql-syntax.git", .upToNextMinor(from: "0.1.18")),
+		.package(name: "Kineo", url: "https://github.com/kasei/kineo.git", .upToNextMinor(from: "0.0.30")),
+		.package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0"))
     ],
     targets: [
     	.target(
     		name: "SPARQLQueryAnalysis",
             dependencies: ["Kineo", "SPARQLSyntax"]
     	),
+        .target(
+            name: "sparql-analyze",
+            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax", "Rainbow"]
+        ),
         .target(
             name: "sparql-paths",
             dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
