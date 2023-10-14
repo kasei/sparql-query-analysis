@@ -23,7 +23,8 @@ struct MultiAnalyzer: Analyzer {
     init() {
         analyzers = [
             SubquerySortAnalyzer(),
-            UnboundFilterVariableAnalyzer()
+            UnboundFilterVariableAnalyzer(),
+            UselessOptionalAnalyzer()
         ]
     }
     func analyze(sparql: String, query: Query, algebra: Algebra, reporter: Reporter) throws -> Int {

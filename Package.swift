@@ -13,7 +13,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-		.package(name: "SPARQLSyntax", url: "https://github.com/kasei/swift-sparql-syntax.git", .upToNextMinor(from: "0.1.18")),
+		.package(name: "SPARQLSyntax", url: "https://github.com/kasei/swift-sparql-syntax.git", .upToNextMinor(from: "0.2.0")),
 		.package(name: "Kineo", url: "https://github.com/kasei/kineo.git", .upToNextMinor(from: "0.0.30")),
 		.package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0"))
     ],

@@ -12,10 +12,8 @@ public struct UnboundFilterVariableAnalyzer: Analyzer {
     public var description = "Finds filter expressions which use variables not in-scope."
     
     func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
-        guard var p = SPARQLParser(string: sparql) else { fatalError("Failed to construct SPARQL parser") }
-        let a = try p.parseAlgebra()
         var count = 0
-        try a.walk { (algebra) in
+        try algebra.walk { (algebra) in
             switch algebra {
             case let .filter(child, expr):
                 let evars = expr.variables
