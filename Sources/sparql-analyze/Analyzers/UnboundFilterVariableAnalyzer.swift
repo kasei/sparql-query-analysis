@@ -11,7 +11,7 @@ public struct UnboundFilterVariableAnalyzer: Analyzer {
     public let name = "UnboundFilterVariable"
     public var description = "Finds filter expressions which use variables not in-scope."
     
-    func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
+    public func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
         var count = 0
         try algebra.walk { (algebra) in
             switch algebra {
@@ -20,7 +20,7 @@ public struct UnboundFilterVariableAnalyzer: Analyzer {
                 let inscope = child.inscope
                 let unbound = evars.subtracting(inscope)
                 if !unbound.isEmpty {
-                    let identifier : Reporter.Identifier = .tokenSet(Set(unbound.map{ ._var($0) }))
+                    let identifier : ReportIdentifier = .tokenSet(Set(unbound.map{ ._var($0) }))
                     let message: String
                     if unbound.count == 1 {
                         let v = unbound.first!

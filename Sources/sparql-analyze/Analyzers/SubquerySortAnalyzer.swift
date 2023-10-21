@@ -40,7 +40,7 @@ public struct SubquerySortAnalyzer: Analyzer {
     public let name = "SubqueryWithSort"
     public var description = "Finds subqueries that have useless sorting applied."
     
-    func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
+    public func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
         var count = 0
         try algebra.walk { (algebra) in
             switch algebra {
@@ -48,7 +48,7 @@ public struct SubquerySortAnalyzer: Analyzer {
                 var sort: Algebra? = nil
                 try q.algebra.walk { if case .order = $0 { sort = $0 } }
                 
-                var identifier : Reporter.Identifier = .none
+                var identifier : ReportIdentifier = .none
                 if let sort {
                     identifier = .algebra({
                         if $0 == sort {

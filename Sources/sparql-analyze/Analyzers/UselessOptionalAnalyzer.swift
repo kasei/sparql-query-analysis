@@ -12,12 +12,12 @@ public struct UselessOptionalAnalyzer: Analyzer {
     public let name = "UselessOptionalAnalyzer"
     public var description = "Finds OPTIONAL patterns that produce data that is not used in producing results."
     
-    func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
+    public func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
         var count = 0
         try algebra.walkWithSubqueries { (algebra) in
             switch algebra {
             case .leftOuterJoin(.joinIdentity, _, _):
-                let identifier : Reporter.Identifier = .algebra({
+                let identifier : ReportIdentifier = .algebra({
                     if $0 == algebra {
                         return ("Issue", 0)
                     }

@@ -45,22 +45,25 @@ func printHighlightedQuery(_ sparql : String, printAlgebra: Bool) {
     }
 }
 
-func analyze(_ sparql : String) throws {
+func analyze(_ sparql : String, reporter: Reporter) throws {
     guard var parser = SPARQLParser(string: sparql) else { fatalError("Failed to construct SPARQL parser") }
     let query = try parser.parseQuery()
     let algebra = query.algebra
     let m = MultiAnalyzer()
-    let reporter = Reporter()
-    let issues = try m.analyze(sparql: sparql, query: query, algebra: algebra, reporter: reporter)
-    print("\n")
-    print("\(issues) isues found.")
+    try m.analyze(sparql: sparql, query: query, algebra: algebra, reporter: reporter)
 }
 
 let ser = SPARQLSerializer(prettyPrint: false)
 let a = QueryAnalysis()
+var reporter = ConsoleReporter(printIssues: true, printSummary: true)
+var totalQueries = 0
 try a.forEachQuery { (lineno, sparql, flags, args) -> Int in
+    totalQueries += 1
+    if totalQueries % 1000 == 0 {
+        print("\r\(totalQueries)")
+    }
     do {
-        try analyze(sparql)
+        try analyze(sparql, reporter: reporter)
         return 0
     } catch {
         let sparql = ser.reformat(sparql)
@@ -69,3 +72,6 @@ try a.forEachQuery { (lineno, sparql, flags, args) -> Int in
         return 0
     }
 }
+//print("\r", terminator: "")
+reporter.reportSummary(queryCount: totalQueries)
+

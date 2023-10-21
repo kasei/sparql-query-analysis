@@ -11,7 +11,7 @@ import SPARQLSyntax
 import SPARQLQueryAnalysis
 
 
-protocol Analyzer: CustomStringConvertible {
+public protocol Analyzer: CustomStringConvertible {
     var name: String { get }
     func analyze(sparql: String, query: Query, algebra: Algebra, reporter: Reporter) throws -> Int
 }
@@ -27,6 +27,8 @@ struct MultiAnalyzer: Analyzer {
             UselessOptionalAnalyzer()
         ]
     }
+    
+    @discardableResult
     func analyze(sparql: String, query: Query, algebra: Algebra, reporter: Reporter) throws -> Int {
         var issues = 0
         for a in analyzers {

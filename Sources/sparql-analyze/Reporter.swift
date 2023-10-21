@@ -9,7 +9,7 @@ import Foundation
 import SPARQLSyntax
 import Rainbow
 
-typealias AlgebraIdentifier = (Algebra) -> (String, Int)?
+public typealias AlgebraIdentifier = (Algebra) -> (String, Int)?
 
 func makeHighlighter(color: KeyPath<String, String>) -> SPARQLSerializer.Highlighter {
     return { (s, state) in
@@ -80,14 +80,32 @@ func highlightedAlgebra(_ sparql : String, _ printAlgebra: Bool, _ predicate : A
     return nil
 }
 
-struct Reporter {
-    enum Identifier {
-        case algebra(AlgebraIdentifier)
-        case tokenSet(Set<SPARQLToken>)
-        case none
+public enum ReportIdentifier {
+    case algebra(AlgebraIdentifier)
+    case tokenSet(Set<SPARQLToken>)
+    case none
+}
+
+public protocol Reporter {
+    var printIssues: Bool { get }
+    var printSummary: Bool { get }
+    func reportIssue(sparql: String, query: Query, algebra: Algebra, analyzer: Analyzer, code: String, message: String, identifier: ReportIdentifier) throws
+}
+
+class ConsoleReporter: Reporter {
+    var printIssues: Bool
+    var printSummary: Bool
+    var summary: [String: Int]
+    
+    init(printIssues: Bool = true, printSummary: Bool = true) {
+        self.printIssues = printIssues
+        self.printSummary = printSummary
+        self.summary = [:]
     }
     
-    func reportIssue(sparql: String, query: Query, algebra: Algebra, analyzer: Analyzer, code: String, message: String, identifier: Identifier) throws {
+    func reportIssue(sparql: String, query: Query, algebra: Algebra, analyzer: Analyzer, code: String, message: String, identifier: ReportIdentifier) throws {
+        summary[analyzer.name, default: 0] += 1
+        guard printIssues else { return }
         let issue = "ISSUE".red
         print("\(issue): \(analyzer.name): \(message)")
         switch identifier {
@@ -101,6 +119,18 @@ struct Reporter {
             print(s.reformatHighlightingTokens(sparql, tokens: tokens))
         case .none:
             break
+        }
+    }
+    
+    func reportSummary(queryCount: Int) {
+        guard printSummary else { return }
+        let total = summary.values.reduce(0, +)
+        print("\(queryCount) total queries analyzed.")
+        print("\(total) total issues found", terminator: "")
+        print((total > 0) ? ":" : ".")
+        for entry in summary.sorted(by: { $0.1 > $1.1 }) {
+            let message = String(format: "%6d %@", entry.value, entry.key)
+            print("- \(message)")
         }
     }
 }
