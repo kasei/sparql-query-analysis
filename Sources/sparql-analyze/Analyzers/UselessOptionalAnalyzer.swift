@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  UselessOptionalAnalyzer.swift
 //
 //
 //  Created by Gregory Todd Williams on 10/11/23.
