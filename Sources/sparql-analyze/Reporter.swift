@@ -26,7 +26,7 @@ func color(for value: Int) -> KeyPath<String, String> {
     return colors[value % colors.count]
 }
 
-func highlightedAlgebra(_ sparql : String, _ printAlgebra: Bool, _ predicate : AlgebraIdentifier) throws -> String? {
+func highlightedAlgebra(_ sparql : String, _ printAlgebra: Bool, _ predicate : @escaping AlgebraIdentifier) throws -> String? {
     var parser = SPARQLParser(string: sparql)!
     let q = try parser.parseQuery()
     let a = q.algebra
@@ -34,7 +34,7 @@ func highlightedAlgebra(_ sparql : String, _ printAlgebra: Bool, _ predicate : A
     var names = [Int: String]()
     var highlight = [Int: Set<ClosedRange<Int>>]()
     var algebraToTokens = [Algebra: Set<ClosedRange<Int>>]()
-    try a.walkWithSubqueries { (algebra) in
+    let walkConfig = WalkConfig(type: WalkType(descendIntoAlgebras: true, descendIntoSubqueries: true, descendIntoExpressions: false), algebraHandler: { (algebra) in
         let ranges = parser.getTokenRange(for: algebra)
         
         // HIGHLIGHT AGGREGATIONS IN THE OUTPUT
@@ -53,7 +53,8 @@ func highlightedAlgebra(_ sparql : String, _ printAlgebra: Bool, _ predicate : A
         } else {
             algebraToTokens[algebra] = ranges
         }
-    }
+    })
+    try a.walk(config: walkConfig)
 
     if !highlight.isEmpty {
         let ser = SPARQLSerializer(prettyPrint: true)

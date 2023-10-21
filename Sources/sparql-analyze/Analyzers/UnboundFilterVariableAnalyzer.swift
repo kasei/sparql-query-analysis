@@ -15,6 +15,23 @@ public struct UnboundFilterVariableAnalyzer: Analyzer {
         var count = 0
         try algebra.walk { (algebra) in
             switch algebra {
+            case let .leftOuterJoin(lhs, rhs, expr):
+                let evars = expr.variables
+                let inscope = lhs.inscope.union(rhs.inscope)
+                let unbound = evars.subtracting(inscope)
+                if !unbound.isEmpty {
+                    let identifier : ReportIdentifier = .tokenSet(Set(unbound.map{ ._var($0) }))
+                    let message: String
+                    if unbound.count == 1 {
+                        let v = unbound.first!
+                        message = "Variable will be unbound in FILTER evaluation: \(v)"
+                    } else {
+                        message = "Variables will be unbound in FILTER evaluation: " + unbound.joined(separator: ", ")
+                    }
+                    
+                    try reporter.reportIssue(sparql: sparql, query: query, algebra: algebra, analyzer: self, code: "1", message: message, identifier: identifier)
+                    count += 1
+                }
             case let .filter(child, expr):
                 let evars = expr.variables
                 let inscope = child.inscope

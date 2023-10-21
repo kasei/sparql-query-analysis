@@ -14,16 +14,16 @@ public struct UselessOptionalAnalyzer: Analyzer {
     
     public func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
         var count = 0
-        try algebra.walkWithSubqueries { (algebra) in
-            switch algebra {
+        try algebra.walkWithSubqueries { (a) in
+            switch a {
             case .leftOuterJoin(.joinIdentity, _, _):
                 let identifier : ReportIdentifier = .algebra({
-                    if $0 == algebra {
+                    if $0 == a {
                         return ("Issue", 0)
                     }
                     return nil
                 })
-                let message = "OPTIONAL is useless as its left-hand-side argument is emtpy."
+                let message = "OPTIONAL is useless as its left-hand-side argument is empty."
                 try reporter.reportIssue(sparql: sparql, query: query, algebra: algebra, analyzer: self, code: "1", message: message, identifier: identifier)
                 count += 1
             default:
