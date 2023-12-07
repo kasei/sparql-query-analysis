@@ -10,7 +10,7 @@ import SPARQLSyntax
 
 public struct UselessOptionalAnalyzer: Analyzer {
     public let name = "UselessOptionalAnalyzer"
-    public var description = "Finds OPTIONAL patterns that produce data that is not used in producing results."
+    public var description = "Finds OPTIONAL patterns whose left-hand side is empty (making the OPTIONAL into just a non-OPTIONAL)."
     
     public func analyze(sparql: String, query: SPARQLSyntax.Query, algebra: SPARQLSyntax.Algebra, reporter: Reporter) throws -> Int {
         var count = 0

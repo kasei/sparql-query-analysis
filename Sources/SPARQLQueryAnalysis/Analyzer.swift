@@ -8,7 +8,6 @@
 
 import Foundation
 import SPARQLSyntax
-import SPARQLQueryAnalysis
 
 
 public protocol Analyzer: CustomStringConvertible {
@@ -16,20 +15,21 @@ public protocol Analyzer: CustomStringConvertible {
     func analyze(sparql: String, query: Query, algebra: Algebra, reporter: Reporter) throws -> Int
 }
 
-struct MultiAnalyzer: Analyzer {
-    let name: String = "MultiAnalyzer"
-    let description: String = "MultiAnalyzer"
+public struct MultiAnalyzer: Analyzer {
+    public let name: String = "MultiAnalyzer"
+    public let description: String = "MultiAnalyzer"
     var analyzers: [Analyzer]
-    init() {
+    public init() {
         analyzers = [
             SubquerySortAnalyzer(),
             UnboundFilterVariableAnalyzer(),
-            UselessOptionalAnalyzer()
+            UselessOptionalAnalyzer(),
+            UselessOptionalAnalyzer2()
         ]
     }
     
     @discardableResult
-    func analyze(sparql: String, query: Query, algebra: Algebra, reporter: Reporter) throws -> Int {
+    public func analyze(sparql: String, query: Query, algebra: Algebra, reporter: Reporter) throws -> Int {
         var issues = 0
         for a in analyzers {
             do {

@@ -20,14 +20,18 @@ let package = Package(
     targets: [
     	.target(
     		name: "SPARQLQueryAnalysis",
-            dependencies: ["Kineo", "SPARQLSyntax"]
+            dependencies: ["Kineo", "SPARQLSyntax", "Rainbow"]
     	),
         .target(
             name: "sparql-analyze",
-            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax", "Rainbow"]
+            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
         ),
         .target(
             name: "sparql-paths",
+            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+        ),
+        .target(
+            name: "sparql-complex-paths",
             dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
         ),
         .target(
@@ -45,6 +49,10 @@ let package = Package(
         .target(
             name: "sparql-subquery-sorts",
             dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+        ),
+        .testTarget(
+            name: "SPARQLAnalyzeTests",
+            dependencies: ["SPARQLQueryAnalysis"]
         ),
     ]
 )
