@@ -13,6 +13,9 @@ let package = Package(
             name: "SPARQLQueryAnalysis",
             targets: ["SPARQLQueryAnalysis"]
         ),
+		.executable(
+			name: "sparql-analyze",
+			targets: ["sparql-analyze"]),
     ],
     dependencies: [
         .package(url: "https://github.com/kasei/swift-sparql-syntax.git", .upToNextMinor(from: "0.2.11")),
