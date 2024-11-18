@@ -1,11 +1,13 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "SPARQLQueryAnalysis",
-    platforms: [.macOS(.v10_15)],
+    platforms: [
+        .macOS(.v13)
+    ],
     products: [
         .library(
             name: "SPARQLQueryAnalysis",
@@ -13,46 +15,73 @@ let package = Package(
         ),
     ],
     dependencies: [
-		.package(name: "SPARQLSyntax", url: "https://github.com/kasei/swift-sparql-syntax.git", .upToNextMinor(from: "0.2.5")),
-		.package(name: "Kineo", url: "https://github.com/kasei/kineo.git", .upToNextMinor(from: "0.0.30")),
-		.package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0"))
+        .package(url: "https://github.com/kasei/swift-sparql-syntax.git", .upToNextMinor(from: "0.2.11")),
+		.package(url: "https://github.com/kasei/kineo.git", .upToNextMinor(from: "0.0.108")),
+        .package(url: "https://github.com/onevcat/Rainbow", .upToNextMajor(from: "4.0.0"))
     ],
     targets: [
     	.target(
     		name: "SPARQLQueryAnalysis",
-            dependencies: ["Kineo", "SPARQLSyntax", "Rainbow"]
+            dependencies: [
+                .product(name: "Kineo", package: "Kineo"),
+                .product(name: "SPARQLSyntax", package: "swift-sparql-syntax"),
+                "Rainbow"
+            ]
     	),
-        .target(
+        .executableTarget(
             name: "sparql-analyze",
-            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+            dependencies: [
+                "SPARQLQueryAnalysis",
+                .product(name: "SPARQLSyntax", package: "swift-sparql-syntax"),
+            ]
         ),
-        .target(
+        .executableTarget(
             name: "sparql-paths",
-            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+            dependencies: [
+                "SPARQLQueryAnalysis",
+                .product(name: "SPARQLSyntax", package: "swift-sparql-syntax"),
+            ]
         ),
-        .target(
+        .executableTarget(
             name: "sparql-complex-paths",
-            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+            dependencies: [
+                "SPARQLQueryAnalysis",
+                .product(name: "SPARQLSyntax", package: "swift-sparql-syntax"),
+            ]
         ),
-        .target(
+        .executableTarget(
             name: "sparql-characteristic-sets-multipreds",
-            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+            dependencies: [
+                "SPARQLQueryAnalysis",
+                .product(name: "SPARQLSyntax", package: "swift-sparql-syntax"),
+            ]
         ),
-        .target(
+        .executableTarget(
             name: "sparql-characteristic-sets",
-            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+            dependencies: [
+                "SPARQLQueryAnalysis",
+                .product(name: "SPARQLSyntax", package: "swift-sparql-syntax"),
+            ]
         ),
-        .target(
+        .executableTarget(
             name: "sparql-unbound-predicates",
-            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+            dependencies: [
+                "SPARQLQueryAnalysis",
+                .product(name: "SPARQLSyntax", package: "swift-sparql-syntax"),
+            ]
         ),
-        .target(
+        .executableTarget(
             name: "sparql-subquery-sorts",
-            dependencies: ["SPARQLQueryAnalysis", "SPARQLSyntax"]
+            dependencies: [
+                "SPARQLQueryAnalysis",
+                .product(name: "SPARQLSyntax", package: "swift-sparql-syntax"),
+            ]
         ),
         .testTarget(
             name: "SPARQLAnalyzeTests",
-            dependencies: ["SPARQLQueryAnalysis"]
+            dependencies: [
+                "SPARQLQueryAnalysis"
+            ]
         ),
     ]
 )

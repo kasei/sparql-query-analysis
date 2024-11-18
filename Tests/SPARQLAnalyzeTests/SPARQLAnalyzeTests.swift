@@ -81,7 +81,7 @@ class SPARQLAnalyzeTest: XCTestCase {
         }
         GROUP BY ?s
         """)
-
+        
         // OPTIONAL is important for the cardinality of ?o in the SUM (even though the cardinality is not important for the GROUP_CONCAT)
         try analyzer(UselessOptionalAnalyzer2(), resultsInNoWarningsForQuery: """
         PREFIX ex: <http://example.org/>
@@ -93,7 +93,7 @@ class SPARQLAnalyzeTest: XCTestCase {
         }
         GROUP BY ?s
         """)
-
+        
         // OPTIONAL is NOT important because ?s is grouped and cardinality of ?o disappears in the GROUP_CONCAT(DISTINCT)
         try analyzer(UselessOptionalAnalyzer2(), resultsInKey: "UselessOptionalAnalyzer2", forQuery: """
         PREFIX ex: <http://example.org/>
@@ -105,7 +105,7 @@ class SPARQLAnalyzeTest: XCTestCase {
         }
         GROUP BY ?s
         """)
-
+        
         // OPTIONAL is NOT important because ?s is grouped and nothing else is projected
         try analyzer(UselessOptionalAnalyzer2(), resultsInKey: "UselessOptionalAnalyzer2", forQuery: """
         PREFIX ex: <http://example.org/>
@@ -119,7 +119,7 @@ class SPARQLAnalyzeTest: XCTestCase {
         }
         GROUP BY ?s
         """)
-
+        
         // OPTIONAL is NOT important because ?p and ?o are grouped and nothing else is projected
         try analyzer(UselessOptionalAnalyzer2(), resultsInKey: "UselessOptionalAnalyzer2", forQuery: """
         PREFIX ex: <http://example.org/>
@@ -134,7 +134,7 @@ class SPARQLAnalyzeTest: XCTestCase {
         }
         GROUP BY ?p ?o
         """)
-
+        
         // OPTIONAL is NOT important because ?p and ?o are grouped and cardinality of ?o disappears in the GROUP_CONCAT(DISTINCT) and MIN()
         try analyzer(UselessOptionalAnalyzer2(), resultsInKey: "UselessOptionalAnalyzer2", forQuery: """
         PREFIX ex: <http://example.org/>
@@ -148,6 +148,127 @@ class SPARQLAnalyzeTest: XCTestCase {
             }
         }
         GROUP BY ?p ?o
+        """)
+        
+        //
+        try analyzer(UselessOptionalAnalyzer2(), resultsInKey: "UselessOptionalAnalyzer2", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?id where {
+            ?s ex:id ?id .
+            OPTIONAL {
+                ?s ex:q ?o .
+            }
+        }
+        GROUP BY ?id
+        """)
+    }
+
+//    func testUselessOptionalAnalyzer2_() throws {
+//        try analyzer(UselessOptionalAnalyzer2(), resultsInKey: "UselessOptionalAnalyzer2", forQuery: """
+//        PREFIX ex: <http://example.org/>
+//        select ?o where {
+//            ?s ex:id ?id .
+//            OPTIONAL {
+//                SERVICE <http://example.org/sparql> { ?s ex:q ?o }
+//            }
+//        }
+//        """)
+//    }
+
+    func testLangEqualityFilter() throws {
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            FILTER(LANG(?id) = "EN")
+        }
+        """)
+
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            FILTER("en-US" = LANG(?id))
+        }
+        """)
+
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            FILTER(BOUND(?s) && (LANG(?id) = "EN" || RAND() > 0.5))
+        }
+        """)
+    }
+
+    func testLangEqualityBind() throws {
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            BIND(LANG(?id) = "EN" AS ?langEquals)
+        }
+        """)
+
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            BIND("en-US" = LANG(?id) AS ?langEquals)
+        }
+        """)
+
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            BIND(BOUND(?s) && (LANG(?id) = "EN" || RAND() > 0.5) AS ?result)
+        }
+        """)
+    }
+
+    func testLangEqualityProjection() throws {
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o (LANG(?id) = "EN" AS ?english) where {
+            ?s ex:id ?id .
+        }
+        """)
+
+    }
+
+    func testLangEqualityOptionalFilter() throws {
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            OPTIONAL {
+                ?s ex:q 1 .
+                FILTER(LANG(?id) = "EN")
+            }
+        }
+        """)
+
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            OPTIONAL {
+                ?s ex:q 1 .
+                FILTER("en-US" = LANG(?id))
+            }
+        }
+        """)
+
+        try analyzer(LangEqualsAnalyzer(), resultsInKey: "LangEquals", forQuery: """
+        PREFIX ex: <http://example.org/>
+        select ?o where {
+            ?s ex:id ?id .
+            OPTIONAL {
+                ?s ex:q 1 .
+                FILTER(BOUND(?s) && (LANG(?id) = "EN" || RAND() > 0.5))
+            }
+        }
         """)
     }
 

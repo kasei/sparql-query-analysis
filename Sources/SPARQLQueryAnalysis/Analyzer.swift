@@ -24,7 +24,8 @@ public struct MultiAnalyzer: Analyzer {
             SubquerySortAnalyzer(),
             UnboundFilterVariableAnalyzer(),
             UselessOptionalAnalyzer(),
-            UselessOptionalAnalyzer2()
+            UselessOptionalAnalyzer2(),
+            LangEqualsAnalyzer()
         ]
     }
     
